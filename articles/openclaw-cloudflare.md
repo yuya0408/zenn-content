@@ -1,8 +1,10 @@
-## title: "OpenClaw を Cloudflare Access 背後の Ollama につなぐ"
+---
+title: "OpenClaw を Cloudflare Access 背後の Ollama につなぐ"
 emoji: "🦞"
 type: "tech"
 topics: ["AIエージェント", "cloudflare", "ollama", "openclaw", "ローカルLLM"]
 published: false
+---
 
 ## 前提条件
 

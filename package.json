@@ -1,0 +1,14 @@
+{
+  "name": "zenn-content",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zenn 記事管理用リポジトリ",
+  "scripts": {
+    "preview": "zenn preview",
+    "new:article": "zenn new:article",
+    "new:book": "zenn new:book"
+  },
+  "devDependencies": {
+    "zenn-cli": "^0.1.158"
+  }
+}

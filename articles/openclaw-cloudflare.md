@@ -45,11 +45,11 @@ OpenClaw のモデルプロバイダを、**Cloudflare Access（Zero Trust）で
     providers: {
       ollama: {
         baseUrl: "<https://ollama.xxx>",
-        api: "ollama",              // /v1 は付けない（後述）
+        api: "ollama",              // /v1 は付けない
         headers: {
           "Cookie": "CF_Authorization=＜JWT＞",
         },
-        timeoutSeconds: 300,        // cold local model 対策（後述）
+        timeoutSeconds: 300,        // cold local model 対策
         models: [
           { id: "qwen3.6:27b", name: "qwen3.6:27b", input: ["text"] },
         ],
@@ -123,8 +123,6 @@ headers: {
 :::message
 アプリ側(CloudFlare)のポリシーもサービストークンで認証を通すための設定が別途必要。
 :::
-
----
 
 ---
 

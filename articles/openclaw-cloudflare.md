@@ -11,7 +11,7 @@ published: false
 - **OpenClaw**：Docker を使わず、ローカルに直接インストール（config は `~/.openclaw/openclaw.json`）
 - **Ollama**：別ホストで稼働し、**Cloudflare Access（Zero Trust）** で保護されている
 - **認証方式**：ユーザー JWT （サービストークンでの運用は未検証）
-- **OpenClaw のバージョン**：calver（`2026.x.y`）。`headers` の振る舞いは版依存のため、`openclaw --version` を控えてから試すこと
+- **OpenClaw のバージョン**：calver（`2026.x.y`）。本記事は `2026.7.1` で検証。`headers` の振る舞いは版依存のため、`openclaw --version` を控えてから試すこと
 
 OpenClaw はモデルプロバイダ（Ollama）に直接つなぐのではなく、間に Cloudflare Access が挟まる。この認証をどう越えたかが本記事のテーマ。
 
@@ -45,11 +45,11 @@ OpenClaw のモデルプロバイダを、**Cloudflare Access（Zero Trust）で
     providers: {
       ollama: {
         baseUrl: "<https://ollama.xxx>",
-        api: "ollama",              // /v1 は付けない（後述）
+        api: "ollama",              // /v1 は付けない
         headers: {
           "Cookie": "CF_Authorization=＜JWT＞",
         },
-        timeoutSeconds: 300,        // cold local model 対策（後述）
+        timeoutSeconds: 300,        // cold local model 対策
         models: [
           { id: "qwen3.6:27b", name: "qwen3.6:27b", input: ["text"] },
         ],
@@ -123,8 +123,6 @@ headers: {
 :::message
 アプリ側(CloudFlare)のポリシーもサービストークンで認証を通すための設定が別途必要。
 :::
-
----
 
 ---
 

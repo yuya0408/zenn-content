@@ -3,7 +3,7 @@ title: "OpenClaw を Cloudflare Access 背後の Ollama につなぐ"
 emoji: "🦞"
 type: "tech"
 topics: ["AIエージェント", "cloudflare", "ollama", "openclaw", "ローカルLLM"]
-published: false
+published: true
 ---
 
 ## 前提条件

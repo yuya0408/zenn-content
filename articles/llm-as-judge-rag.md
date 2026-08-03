@@ -16,13 +16,13 @@ published: false
 
 ```mermaid
 flowchart TD
-    A["生成モデル 4候補"]
+    A["生成モデル 4候補<br/>granite4.1:30b / gpt-oss:20b<br/>gemma4:26b / mistral-small3.2:24b"]
     subgraph J["judgeを使う領域"]
         B["判断1: 絶対採点(1〜5点)<br/>用途 = 足切り<br/>弱い候補を落とす"]
         D["判断3-a: ペア比較(両順採点)<br/>用途 = タイ確認<br/>接戦か決着か"]
     end
     F["判断3-b: 非機能計測<br/>TTFT / tok·s / RAM<br/>用途 = 決着"]
-    A --> B --> C["残り2候補"] --> D
+    A --> B --> C["残り2候補<br/>granite4.1:30b / gemma4:26b"] --> D
     D -->|"品質はタイと判明"| F
     F --> G["採用: gemma4:26b"]
 ```

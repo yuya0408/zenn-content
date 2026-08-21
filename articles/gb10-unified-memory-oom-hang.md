@@ -1,5 +1,5 @@
 ---
-title: "エラーを出さずにDGX Sparkが2台とも固まった ― 原因はmodel.train()の呼び忘れによるgradient checkpointingの無効化"
+title: "エラーを出さずにDGX Sparkが2台とも固まった ― 原因はmodel.train()の呼び忘れ"
 emoji: "🧊"
 type: "tech"
 topics: ["nvidia", "pytorch", "fsdp", "transformers", "finetuning"]

@@ -9,7 +9,7 @@ published: false
 Mac Studio 上で動かしているローカル LLM の推論エンジンを、Ollama から [vllm-mlx](https://github.com/waybarrios/vllm-mlx) に移した。その過程で、**設定を何も変えないまま「移行したのに速くならない」状態で立ち上がる**箇所が2つあった。どちらもエラーを出さないので、気づくのが遅れる。同じ構成を組む人向けに、そこだけ書いておく。
 
 :::message
-レイテンシの実測はまだ取れていない。本記事は「移行時にここで詰まる」という設定上の話に限定する。効果の検証は別途。
+構成が成立することとプレフィックスキャッシュが効くことは実測で確認した。ただし Ollama との比較や、同時アクセス下での待ち時間の分布はまだ取れていない。本記事は「移行時にここで詰まる」という話が主で、性能比較の記事ではない。
 :::
 
 ## 前提
@@ -100,24 +100,68 @@ vLLM 本体には `gpu_memory_utilization` があり、既定は **0.9** であ�
 用語として整理しておくと、**TTFT(初回トークンまでの時間)を直接縮めるのは prefix caching** であって、paged KV cache そのものではない。paged 側は KV の断片化を防いでメモリ効率を上げ、その結果として同時実行数を稼ぐ役割になる。「PagedAttention でレイテンシが改善する」と一括りにすると、どのフラグが何に効いているのか見えなくなる。
 :::
 
+## 実測: 2モデルを同時に載せて確かめた
+
+上記を踏まえて、実運用候補の2モデルを単一サーバーに同時 preload して確認した。`--models-config` で登録し、ポート 18012 で起動している。
+
+- [`mlx-community/Qwen3.8-27B-4bit`](https://huggingface.co/mlx-community/Qwen3.8-27B-4bit)
+- [`mlx-community/gemma-4-26B-A4B-it-qat-4bit`](https://huggingface.co/mlx-community/gemma-4-26B-A4B-it-qat-4bit)
+
+確認できたのは以下である。
+
+- **両モデルとも BatchedEngine(paged-cache + continuous-batching)でロードされる。** レジストリ経由でも、前節のフラグを入れれば意図した経路に乗る
+- **単一エンドポイントで `model` フィールドによる切り替えが正常に動く。** 前段のルータは不要のまま
+- **tool calling が両モデルで動く**
+- **プレフィックスキャッシュが効いている。** Qwen 側で **1.17s → 0.63s**。同一プレフィックスの再送で約 46% 短縮した
+- **A/B/A/B と交互にリクエストしても安定する。** 一方のモデルへの切り替えが他方の状態を壊さない
+- **`enable_thinking: false` による思考出力の抑制が効く**
+
+狙っていた構成そのものは、ここで成立が確認できた。
+
+## 設計上の制約: `tool_call_parser` はプロセス全体で1つ
+
+ただし、この検証で**マルチモデル構成に効いてくる制約**が1つ見つかった。
+
+`--tool-call-parser` は**プロセス全体でグローバルな単一の値**であり、`--models-config` の YAML でモデルごとに上書きできない。ソースを追うと `vllm_mlx/server.py` にモジュールレベルの変数として置かれている。
+
+```python
+_tool_call_parser: str | None = None   # パーサー名: auto, mistral, qwen, llama, hermes...
+_tool_parser_instance = None           # 実体化されたパーサー
+```
+
+`_get_or_init_tool_parser()` が遅延初期化で1個だけ実体化し、以後は全リクエストでその1個を使い回す(リクエスト間で `reset()` を呼ぶ)。モデルごとの状態ではない。
+
+これが問題になるのは、**異なるモデルファミリを同居させたとき**である。Qwen 系と Gemma 系では本来必要なパーサーが違うのに、プロセスに1つしか持てない。どちらかに固定すれば、もう一方のツール呼び出しが壊れる。
+
+したがって、**マルチモデル構成では実質的にフォーマット非依存の `--tool-call-parser auto` が必須になる。** 実測では auto で両モデルとも正常に動作した。auto はツール呼び出しの出力フォーマットを順に試して判別する方式で、ドキュメント上も Gemma 4 形式(`<|tool_call>call:name...<tool_call|>`)や Mistral 形式(`[TOOL_CALLS]`)などが判別対象に挙がっている。
+
+:::message alert
+公開ドキュメントの tool calling ガイドは `--tool-call-parser` を単一モデル起動時の CLI フラグとして説明しており、**複数モデルを異なるファミリで同居させた場合にパーサーがどう扱われるかには触れていない。** 「モデルごとに適切なパーサーを指定すればよい」と考えて構成を組むと、ここで詰まる。
+:::
+
 ## ツール呼び出しは、載せる前に軽く投げて確かめる
 
 パーサーが用意されているモデルでも、モデルのバージョンや量子化の組み合わせによってはパースを外すことがある。ツール呼び出し前提のシステムでは、これは静かに壊れる。モデルは自然言語としてはもっともらしい応答を返し、ただ `tool_calls` が空になる、という形で失敗する。
 
 そこで、本番のスキーマを載せる前に**引数1つの最小ツールを1本だけ定義して呼ばせるスモークテスト**を通すことにした。数秒で終わる。「パーサーが対応表に載っている」ことと「この環境で実際にパースできる」ことの間には差があるので、確認しておく価値がある。
 
+前節の通りパーサーはプロセスに1つしか持てないので、**マルチモデル構成では登録した全モデルに対してこれを通す**必要がある。1モデルで通ったから他も通る、とは言えない。
+
 ## まとめ
 
 - **`gpu_memory_utilization` の感覚を持ち込まない。** vllm-mlx は「重みの常駐予算」と「キャッシュ割合」の二段構えで、`memory_budget_gb` は重みしか数えない
 - **効かせたい機能はデフォルトで無効。** `--continuous-batching` / `--use-paged-cache` / `--prefix-trie-cache` はいずれも既定 `False`。エラーが出ないまま「移行したのに速くならない」になる
-- ツールパーサーは、対応表を信じずに一度投げて確かめる
+- **`tool_call_parser` はプロセスに1つしか持てない。** モデルごとの上書きができないため、異なるファミリを同居させるなら `auto` が実質必須になる
+- ツールパーサーは、対応表を信じずに登録した全モデルに投げて確かめる
 
-冒頭に書いた通り、**レイテンシの実測はまだ無い。** 本記事は「移行時にここで詰まる」という設定上の話であって、効果を数字で裏づけたものではない。実測はフラグ全オフ / 全オン / Ollama の比較として別途取る。
+2モデル同時ロードの構成が成立すること、プレフィックスキャッシュが効くこと(Qwen で 1.17s → 0.63s)までは実測で確認できた。**ただし Ollama との比較と、同時アクセス下での待ち時間の分布はまだ取れていない。** 移行の目的だったレイテンシ改善そのものを裏づけるには、フラグ全オフ / 全オン / Ollama の3点比較が要る。そこは別途測る。
 
 ## 参考
 
 - [waybarrios/vllm-mlx](https://github.com/waybarrios/vllm-mlx) ― MLX ネイティブの推論サーバ(非公式)
   - [Model Registry](https://github.com/waybarrios/vllm-mlx/blob/main/docs/guides/model-registry.md) ― マルチモデル構成の YAML スキーマ
   - [CLI Reference](https://github.com/waybarrios/vllm-mlx/blob/main/docs/reference/cli.md) ― 本記事で挙げたフラグと既定値の出典
+  - [Tool Calling](https://github.com/waybarrios/vllm-mlx/blob/main/docs/guides/tool-calling.md) ― `--tool-call-parser` と `auto` の判別対象フォーマット
+  - [`vllm_mlx/server.py`](https://github.com/waybarrios/vllm-mlx/blob/main/vllm_mlx/server.py) ― `_tool_call_parser` / `_tool_parser_instance` がモジュールレベルに置かれている箇所
 - [vllm-project/vllm-metal](https://github.com/vllm-project/vllm-metal) ― Apple Silicon 向け vLLM ハードウェアプラグイン(コミュニティ保守)
 - [Ollama FAQ](https://docs.ollama.com/faq) ― `OLLAMA_MAX_LOADED_MODELS` / `OLLAMA_NUM_PARALLEL`

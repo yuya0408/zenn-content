@@ -3,7 +3,7 @@ title: "YOLO vs VLM ── 画像検出タスクに向いているのはどち�
 emoji: "🧭"
 type: "tech"
 topics: ["機械学習", "コンピュータビジョン", "llm", "yolo", "mlops"]
-published: false
+published: true
 ---
 
 :::message

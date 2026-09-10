@@ -3,7 +3,7 @@ title: "YOLO vs VLM ── 汎用 VLM は本当に精度で劣るのか、統計
 emoji: "⚖️"
 type: "tech"
 topics: ["yolo", "vlm", "gemini", "統計", "機械学習"]
-published: false
+published: true
 ---
 
 :::message

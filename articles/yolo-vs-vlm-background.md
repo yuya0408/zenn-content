@@ -1,5 +1,5 @@
 ---
-title: "YOLO vs VLM ── 画像検出タスクに向いているのはどちらなのか【前編・背景】"
+title: "YOLO vs VLM ── 画像検出タスクに向いているのはどちらなのか"
 emoji: "🧭"
 type: "tech"
 topics: ["機械学習", "コンピュータビジョン", "llm", "yolo", "mlops"]

@@ -4,6 +4,7 @@ emoji: "🛠️"
 type: "tech"
 topics: ["python", "fastapi", "docker", "machinelearning", "mlops"]
 published: true
+related: ["articles/secom-defect-analysis", "articles/secom-defect-operations", "model_card"]
 ---
 
 これは、半導体製造データ SECOM を題材にした不良予測プロジェクトの記録の一つ、「実装編」である。同じ1つのプロジェクトを、別々の角度から書いている。

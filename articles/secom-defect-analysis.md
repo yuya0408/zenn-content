@@ -4,6 +4,7 @@ emoji: "🔬"
 type: "tech"
 topics: ["python", "機械学習", "データ分析", "scikitlearn", "製造業"]
 published: true
+related: ["articles/secom-defect-operations", "articles/secom-defect-serving"]
 ---
 
 製造業 × データサイエンスにおける有名なデータセットとしてSECOMが挙げられる。半導体製造工程のセンサーデータから、製品が不良になるかどうかを予測する——そういった用途で、KaggleやGitHubでも題材にされていることがある。

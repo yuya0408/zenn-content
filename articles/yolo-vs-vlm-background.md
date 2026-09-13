@@ -4,6 +4,7 @@ emoji: "🧭"
 type: "tech"
 topics: ["機械学習", "コンピュータビジョン", "llm", "yolo", "mlops"]
 published: true
+related: ["articles/yolo-vs-vlm-evaluation-pitfall"]
 ---
 
 :::message

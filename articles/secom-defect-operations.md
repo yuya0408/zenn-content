@@ -4,6 +4,7 @@ emoji: "📡"
 type: "tech"
 topics: ["python", "mlops", "機械学習", "製造業", "監視"]
 published: true
+related: ["articles/secom-defect-analysis", "articles/secom-defect-serving", "reports/drift_report"]
 ---
 
 これは、半導体製造データ SECOM を題材にした不良予測プロジェクトの記録の3本目、「運用編」である。同じ1つのプロジェクトを、3つの角度から書いている。

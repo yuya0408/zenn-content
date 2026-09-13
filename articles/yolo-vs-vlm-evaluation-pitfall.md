@@ -4,6 +4,7 @@ emoji: "⚖️"
 type: "tech"
 topics: ["yolo", "vlm", "gemini", "統計", "機械学習"]
 published: true
+related: ["articles/yolo-vs-vlm-background", "report/report"]
 ---
 
 :::message

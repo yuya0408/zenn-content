@@ -138,3 +138,4 @@ related: ["articles/yolo-vs-vlm-evaluation-pitfall"]
 
 - **前編・背景編(本記事)**― なぜこの検証をしたのか、既存研究を追って問題意識を組み立てる話
 - **後編・実験編**（[記事](https://zenn.dev/yuya0408/articles/yolo-vs-vlm-evaluation-pitfall)）― 有無判定の土俵で、しきい値を公平に調整して統計的に比較し直す話
+<!-- gbrain: [Source: User, 記事執筆・公開, 2026-09-13] -->

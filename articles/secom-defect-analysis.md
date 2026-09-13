@@ -272,3 +272,4 @@ SECOMに取り組んで得た最大の学びは、「データを使う前に、
 
 - **実装編**（[記事](https://zenn.dev/yuya0408/articles/secom-defect-serving)）― 分析結果を API・コンテナとして動かせる形にする話
 - **運用編**（[記事](https://zenn.dev/yuya0408/articles/secom-defect-operations)）― 動かし続けるために何を監視し、異常を見つけたらどう動くかの話
+<!-- gbrain: [Source: User, 記事執筆・公開, 2026-09-13] -->

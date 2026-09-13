@@ -146,3 +146,4 @@ headers: {
 1. `models.providers.<id>.headers` に認証を書く（TUI 使用だと書けないので config に入力）
 2. JWT は `Cf-Access-Jwt-Assertion` ではなく **`CF_Authorization` クッキー**で提示する
 3. 恒久運用は失効しないサービストークンへ（`CF-Access-Client-Id` / `CF-Access-Client-Secret`）。環境変数化は上記バグに注意。
+<!-- gbrain: [Source: User, 記事執筆・公開, 2026-08-23] -->

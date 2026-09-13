@@ -121,3 +121,4 @@ vLLM 本体には `gpu_memory_utilization` があり、既定は **0.9** であ�
   - [CLI Reference](https://github.com/waybarrios/vllm-mlx/blob/main/docs/reference/cli.md) ― 本記事で挙げたフラグと既定値の出典
 - [vllm-project/vllm-metal](https://github.com/vllm-project/vllm-metal) ― Apple Silicon 向け vLLM ハードウェアプラグイン(コミュニティ保守)
 - [Ollama FAQ](https://docs.ollama.com/faq) ― `OLLAMA_MAX_LOADED_MODELS` / `OLLAMA_NUM_PARALLEL`
+<!-- gbrain: [Source: User, 記事執筆(未公開下書き), 2026-09-03] -->

@@ -206,3 +206,4 @@ command=$(echo "$input" | jq -r '.tool_input.command // ""')
 - 公開前の先行事例調査では、コメント欄の宣伝的なノイズを鵜呑みにせず、一次情報とその質を見極める必要があった。
 
 コードは [yuya0408/claude-gpu-queue](https://github.com/yuya0408/claude-gpu-queue) に置いてある(MIT License)。`scripts/gpu_lock.py` 本体、2つのフック、SKILL.md、設計書、テスト一式が入っている。
+<!-- gbrain: [Source: User, 記事執筆(未公開下書き), 2026-08-23] -->

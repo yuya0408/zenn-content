@@ -3,7 +3,7 @@ title: "LLM-as-Judgeの使いどころ ― RAG基盤生成モデル選定で下�
 emoji: "⚖️"
 type: "tech"
 topics: ["llm", "rag", "ollama", "llmops", "mlops"]
-published: true
+published: false
 ---
 
 日本語RAG基盤で、回答を生成するLLMを複数の候補から1つに選ぶ必要があった。品質を主観で判別しないために、別のLLMに回答を採点させる **LLM-as-Judge** で数値化するのは定石だ。問題は、その数値をどこまで意思決定に使ってよいか、だと私は考える。

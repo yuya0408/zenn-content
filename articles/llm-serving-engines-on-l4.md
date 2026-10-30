@@ -251,6 +251,8 @@ TensorRT-LLMは「入力長＋`max_tokens`」ぶんを先に確保するので�
 | bf16 | 26,813〜32,800 | 収まらず、一周する前に追い出される | 3.6〜4.7%（当たるのは先頭の書式 約50トークンだけ） |
 | AWQ・FP8 | 76,096〜99,552 | 収まり、2周目からツール定義ごと当たる | 並行数1で約75%、16で約82% |
 
+200ケースすべてを送った本番の測定では、どの構成も4.7〜9.0%だった。
+
 効いているのは並行数ではなく、量子化で空いたKVの容量である。量子化した構成の速さには、計算が軽くなった分とキャッシュに当たった分が混ざりうる。ケースの数・繰り返し方とKVの容量を並べて確かめたい。
 
 ---
@@ -306,7 +308,7 @@ flowchart TD
 | 推奨 | 想定するユースケース | 決め手 | 気をつけること |
 | --- | --- | --- | --- |
 | **vLLM** | 社内チャットやRAGのPoC。公開モデル（量子化版を含む）を差し替えて評価する | 公開チェックポイントをそのまま読める（2）。既定の設定で起動し、追い出しがカウンタで見える（3・4） | L4のFP8はW8A16（2） |
-| **SGLang** | 同じツール定義・システムプロンプトを先頭に付けるエージェントやバッチ処理 | RadixAttention（用語）。L4でもFP8がW8A8（2）。※今回は共有部分が短く、実測ではない（5） | 入力が増える（1）。割合を手で決める（3）。指標が0で出ない（5）。共有部分の長い順に処理する`lpm`は既定ではない（既定`fcfs`） |
+| **SGLang** | 同じツール定義・システムプロンプトを先頭に付けるエージェントやバッチ処理 | RadixAttention（用語）。L4でもFP8がW8A8（2）。※今回は共有部分が短く、実測ではない（5） | 入力が増える（1）。割合を手で決める（3）。指標が0で出ない（5）。共有部分の長い順に処理する`lpm`は既定ではない（既定`fcfs`）。別の本番の測定では、精度の足切りで3構成とも非劣化を示せなかった（劣るとまでは言えない。入力の+100が原因と見ているが切り分けていない） |
 | **TensorRT-LLM** | モデルを固定して長く運用する本番API | 処理中のリクエストが途中でやり直しにならない（4）。量子化は最初の1回で済む | 量子化を作り直す（2）。混むとTTFTが伸びるので、SLAがTTFTなら自分で測る（4）。キャッシュを消すAPIなし（5） |
 
 迷ったらvLLMで基準を作り、チェックリストで条件を揃えてから他と比べる。
@@ -338,7 +340,7 @@ trtllm-serve ~/models/Qwen3-8B-int4-awq-modelopt \
 - SGLang v0.5.21：https://github.com/sgl-project/sglang/tree/v0.5.21 （`srt/entrypoints/openai/serving_chat.py`・`protocol.py`・`usage_processor.py`、`srt/observability/metrics_collector.py`、`srt/function_call/function_call_parser.py`、`srt/arg_groups/memory_hook.py`）
 - TensorRT-LLM v1.2.1：https://github.com/NVIDIA/TensorRT-LLM/tree/v1.2.1 （`tensorrt_llm/commands/serve.py`、`llmapi/llm_args.py`、`_torch/model_config.py`、`_torch/modules/linear.py`、`cpp/tensorrt_llm/executor/jsonSerialization.cpp`、`docs/source/features/quantization.md`）
 - ModelOpt 0.37.0：https://github.com/NVIDIA/Model-Optimizer/tree/0.37.0 （`examples/llm_ptq/hf_ptq.py`）
-- vLLM v0.31.0：https://github.com/vllm-project/vllm/tree/v0.31.0 （`vllm/config/cache.py`、`vllm/engine/arg_utils.py`、`vllm/model_executor/layers/quantization/fp8.py`、`vllm/model_executor/kernels/linear/__init__.py`・`scaled_mm/marlin.py`・`cutlass.py`・`flashinfer.py`・`deep_gemm.py`・`b12x.py`、`vllm/utils/flashinfer.py`、`vllm/platforms/cuda.py`、`vllm/model_executor/layers/quantization/utils/w8a8_utils.py`、`csrc/libtorch_stable/quantization/w8a8/cutlass/c3x/`、`vllm/entrypoints/openai/chat_completion/protocol.py`、`vllm/v1/metrics/loggers.py`）、起動ログ
+- vLLM v0.31.0：https://github.com/vllm-project/vllm/tree/v0.31.0 （`vllm/config/cache.py`、`vllm/v1/worker/gpu_worker.py`・`utils.py`、`vllm/utils/mem_utils.py`、`vllm/engine/arg_utils.py`、`vllm/model_executor/layers/quantization/fp8.py`、`vllm/model_executor/kernels/linear/__init__.py`・`scaled_mm/marlin.py`・`cutlass.py`・`flashinfer.py`・`deep_gemm.py`・`b12x.py`、`vllm/utils/flashinfer.py`、`vllm/platforms/cuda.py`、`vllm/model_executor/layers/quantization/utils/w8a8_utils.py`、`csrc/libtorch_stable/quantization/w8a8/cutlass/c3x/`、`vllm/entrypoints/openai/chat_completion/protocol.py`、`vllm/v1/metrics/loggers.py`）、起動ログ
 - vLLM プレフィックスキャッシュの設計：https://docs.vllm.ai/en/latest/design/prefix_caching.html
 - TensorRT-LLM スケジューラの方針（`GUARANTEED_NO_EVICT`／`MAX_UTILIZATION`）：https://nvidia.github.io/TensorRT-LLM/latest/legacy/performance/performance-tuning-guide/useful-runtime-flags.html
 - SGLang サーバー引数：https://docs.sglang.io/advanced_features/server_arguments.html 、`new_token_ratio`は`srt/managers/schedule_policy.py`

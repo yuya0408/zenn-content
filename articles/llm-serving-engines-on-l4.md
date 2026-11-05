@@ -1,5 +1,5 @@
 ---
-title: "vLLM・SGLang・TensorRT-LLMをクラウドGPUで動かしたら、それぞれの個性が見えてきた"
+title: "vLLM・SGLang・TensorRT-LLMをEC2で動かしたら、それぞれの個性が見えてきた"
 emoji: "⚙️"
 type: "tech"
 topics: ["vllm", "sglang", "tensorrtllm", "llm", "gpu"]

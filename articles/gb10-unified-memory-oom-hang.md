@@ -3,7 +3,7 @@ title: "エラーを出さずにDGX Sparkが2台とも固まった ― 原因は
 emoji: "🧊"
 type: "tech"
 topics: ["nvidia", "pytorch", "fsdp", "transformers", "finetuning"]
-published: true
+published: false
 ---
 
 ## はじめに

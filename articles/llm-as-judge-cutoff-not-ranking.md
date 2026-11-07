@@ -11,7 +11,7 @@ published: false
 LLMの出力を別のLLMに採点させるLLM-as-Judgeは、人手評価より速く安く数値が出る。**その数値で信頼できるのは「明らかに弱い候補を落とす」判断までで、接戦の候補の順位付けには使えない。**
 
 ```mermaid
-flowchart LR
+flowchart TD
     D[評価設計<br/>1. 何を測るか<br/>2. 候補の設定] --> J[judgeの選定<br/>3. judgeが1つ<br/>4. 自己選好]
     J --> S[採点<br/>5. 提示の順番<br/>6. 回答の長さ]
     S --> A[集計<br/>7. 小さな点差]

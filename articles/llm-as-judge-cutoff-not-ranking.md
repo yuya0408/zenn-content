@@ -3,7 +3,7 @@ title: "LLM-as-Judgeを使うときに気をつけること：足切りには使
 emoji: "⚖️"
 type: "tech"
 topics: ["llm", "rag", "llmops", "evaluation", "mlops"]
-published: false
+published: true
 ---
 
 ## この記事で分かること

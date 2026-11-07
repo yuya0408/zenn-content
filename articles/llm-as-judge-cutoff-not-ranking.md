@@ -1,5 +1,5 @@
 ---
-title: "LLM-as-Judgeを使うときに気をつけること：足切りには使えるが、接戦の順位付けには使えない"
+title: "LLM-as-Judgeを使うときはバイアスに注意する"
 emoji: "⚖️"
 type: "tech"
 topics: ["llm", "rag", "llmops", "evaluation", "mlops"]

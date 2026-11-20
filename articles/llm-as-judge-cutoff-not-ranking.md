@@ -1,5 +1,5 @@
 ---
-title: "LLM-as-Judgeを使うときはバイアスに注意する"
+title: "LLM-as-a-Judgeを使うときはバイアスに注意する"
 emoji: "⚖️"
 type: "tech"
 topics: ["llm", "rag", "llmops", "evaluation", "mlops"]
@@ -8,7 +8,7 @@ published: true
 
 ## この記事で分かること
 
-LLMの出力を別のLLMに採点させるLLM-as-Judgeは、人手評価より速く安く数値が出る。**その数値で信頼できるのは「明らかに弱い候補を落とす」判断までで、接戦の候補の順位付けには使えない。**
+LLMの出力を別のLLMに採点させるLLM-as-a-Judgeは、人手評価より速く安く数値が出る。**その数値で信頼できるのは「明らかに弱い候補を落とす」判断までで、接戦の候補の順位付けには使えない。**
 
 ```mermaid
 flowchart TD
@@ -40,7 +40,7 @@ flowchart TD
 
 | 用語 | 意味 |
 | --- | --- |
-| LLM-as-Judge | LLMの出力の品質を、別のLLM(judge)に採点させる評価方法 |
+| LLM-as-a-Judge | LLMの出力の品質を、別のLLM(judge)に採点させる評価方法 |
 | ルーブリック | 採点基準。点ごとの意味と採点軸を文章で定めたもの |
 | アンカー | ルーブリックで各点に付ける、その点に当たる回答の説明 |
 | 参照解答 | judgeに渡す、その質問の期待する回答 |
